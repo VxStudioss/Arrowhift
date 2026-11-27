@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../core/ad_mob_manager.dart'; // Imported your clean AdMob Manager file
 import '../../core/app_colors.dart';
 import '../../core/audio_manager.dart';
 
@@ -79,18 +80,28 @@ class GameOverScreen extends StatelessWidget {
 
                 const SizedBox(height: 48),
 
-                // 1. Primary Action: Revive & Continue (Easy to plug ads here later!)
+                // 1. Primary Action: Revive & Continue (Now connected to AdMob!)
                 _ActionButton(
                   icon: LucideIcons.heartHandshake,
                   label: 'Revive & Continue',
                   subtitle: 'Get 1 more life to try again',
                   gradient: AppColors.successGradient,
                   onTap: () {
-                    if (!context.mounted) return;
-                    Navigator.pushReplacementNamed(
-                      context,
-                      '/game',
-                      arguments: {'level': levelNumber, 'revived': true},
+                    // Call your clean manager file to handle the ad
+                    AdMobManager().showRewardedAd(
+                      onRewardEarned: () {
+                        // User watched the whole ad! Send them back to the game with revived: true
+                        if (!context.mounted) return;
+                        Navigator.pushReplacementNamed(
+                          context,
+                          '/game',
+                          arguments: {'level': levelNumber, 'revived': true},
+                        );
+                      },
+                      onAdClosed: () {
+                        // This fires when the ad disappears. 
+                        // If they earned the reward, pushReplacementNamed handles the transition.
+                      },
                     );
                   },
                 ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.3),
@@ -169,7 +180,7 @@ class _ActionButton extends StatelessWidget {
               ],
             ),
           ],
-         ),
+        ),
       ),
     );
   }

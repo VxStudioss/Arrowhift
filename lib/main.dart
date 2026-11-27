@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arrow_escape/core/ad_mob_manager.dart';
+
 import 'core/constants.dart';
 import 'app.dart';
 import 'data/repositories/progress_repository.dart';
@@ -13,7 +15,7 @@ import 'core/audio_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   // 0. Initialize Firebase & Crashlytics safely
   try {
     await Firebase.initializeApp();
@@ -40,14 +42,21 @@ void main() async {
     };
   }
 
-  // 1. Initialize AudioManager safely
+  // 1. Initialize AdMob Manager safely to start preloading ads in the background
+  try {
+    await AdMobManager().initialize();
+  } catch (e) {
+    debugPrint('AdMob initialization error: $e');
+  }
+
+  // 2. Initialize AudioManager safely
   try {
     await AudioManager.instance.initialize();
   } catch (e) {
     debugPrint('AudioManager init error: $e');
   }
 
-  // 2. Lock to portrait safely
+  // 3. Lock to portrait safely
   try {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -56,7 +65,7 @@ void main() async {
     debugPrint('Orientations init error: $e');
   }
 
-  // 3. Edge-to-edge system UI safely
+  // 4. Edge-to-edge system UI safely
   try {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -87,6 +96,7 @@ void main() async {
     debugPrint('LevelRepository init error: $e');
   }
 
+  // 6. Launch your clean setup inside MultiProvider
   runApp(
     MultiProvider(
       providers: [

@@ -14,6 +14,12 @@
         android:hardwareAccelerated="true"
         android:windowSoftInputMode="adjustResize">
 
+        <!-- GOOGLE ADMOB INITIALIZATION IDENTIFIER (Required by SDK) -->
+        <!-- Using safe global test ID; swap with your real ID once your developer console is active -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
         <!-- Disable Impeller on Android to prevent Vulkan GPU driver crashes on older devices -->
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
